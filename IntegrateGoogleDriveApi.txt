@@ -1,0 +1,75 @@
+******************** Đối với laravel 8 ********************
+B1: Create Provider For Google Drive Service
+=> php artisan make:provider GoogleDriveServiceProvider
+=> Sau đó vào config/app.php tìm đến providers khai báo App\Providers\GoogleDriveServiceProvider::class,
+B2: Installing Google API Services Client via Composer
+(document: https://github.com/googleapis/google-api-php-client)
+=> composer require google/apiclient
+B3: Installing Flysystem Adapter for Google Drive
+(document: https://github.com/masbug/flysystem-google-drive-ext)
+For Flysystem V2/V3 or Laravel >= 9.x.x
+=> composer require masbug/flysystem-google-drive-ext => Cài thằng này
+For Flysystem V1 or Laravel <= 8.x.x use 1.x.x version of the package
+=> composer require masbug/flysystem-google-drive-ext:"^1.0.0"
+B4: Vào App\Providers\GoogleDriveServiceProvider khai báo vào boot cấu hình của google drive
+ /**
+     * Bootstrap services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        \Storage::extend("google", function ($app, $config) {
+            $client = new \Google_Client();
+            $client->setClientId($config['clientId']);
+            $client->setClientSecret($config['clientSecret']);
+            $client->refreshToken($config['refreshToken']);
+            $service = new Drive($client);
+            $adapter = new GoogleDriveAdapter($service, $config['folderId']);
+            return new Filesystem($adapter);
+        });
+    }
+B5: Vào Google Developers Console để lấy ra client ID và client Secret
+B6: Cách lấy Refresh Token để đưa vào cấu hình Google Drive Api
++ Vào https://developers.google.com/oauthplayground/
++ Kéo thanh scroll kiếm đến Drive API v3 => Copy url https://www.googleapis.com/auth/drive và dán vào ô input (input your own scopes)
++ Click vào bánh răng tick chọn Use your own OAuth credentials => Lúc này sẽ hiển thị ra 2 ô input điền OAuth Client ID và OAuth Client secret. Vào trong https://console.cloud.google.com/
+copy Client ID và Client secret và dán vào trong lại 2 ô input OAuth Client ID và OAuth Client secret. Sau đó close bánh răng lại rồi click chọn Authorize APIs
++ Click chọn email. Rùi cứ tiếp tục continue
++ Nếu xuất hiện lỗi "Authorization Error" (Error 403: access_denided). Vào OAuth consent screen => ADD USERS (Dán cái email đó vào là xong) => SAVE
+Sau đó quay lại trang thông báo lỗi nhấn refresh. Nếu nó báo tiếp lỗi "Google hasn't verified this app" thì cứ nhấn continue
+Lưu ý nếu xuất hiện lỗi trên mới thực hiện bước 5 còn không thực hiện bước 6
++ Click vào Exchange authorization code for tokens => Nó sẽ generate ra 1 mã REFRESH_TOKEN
++ Copy và paste mã REFRESH_TOKEN vào file env
+VD về file .env
+clientId=935476172930-jpftt1ag0dh04k5qp8q9oqbd74v2q8cb.apps.googleusercontent.com
+clientSecret=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
+refreshToken=1//04Q4u2y23Ol1fCgYIARAAGAQSNwF-L9IrwE0syacCnsmfyWysvRcATeF3sMbDtbpXbwrvSPKFUd8P4DRF087MQDSYOdRHKNUbbvk
+B7: Vào config/filesystem.php khai báo cấu hình google vô (Khai báo dưới mảng s3):
+'google' => [
+    'driver' => 'google',
+    'clientId' => env("GOOGLE_CLIENT_ID"),
+    'clientSecret' => env("GOOGLE_CLIENT_SECRET"),
+    'refreshToken' => env("GOOGLE_REFRESH_TOKEN"),
+    'folderId' => env("GOOGLE_DRIVE_FOLDER_ID"),
+],
+B8: Vào Google Drive của chúng ta tạo 1 folder bất kỳ. Click vào folder đó. Nhìn lên url ta sẽ thấy 1 đường dẫn xuất hiện như sau:
+https://drive.google.com/drive/folders/1V_Ha-FYr_bEeyeWmzhf7rlPPWT6Ki9sl => Lúc này chuỗi ký tự nằm sau folders chính là id của folder => Lưu lại
+chuỗi ký tự này vì nó chính là folderId
+B9: Vào file .env tạo ra các biến môi trường cho GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN, GOOGLE_DRIVE_FOLDER_ID
+VD:
+GOOGLE_CLIENT_ID=935476172930-jpftt1ag0dh04k5qp8q9oqbd74v2q8cb.apps.googleusercontent.com,
+GOOGLE_CLIENT_SECRET=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,
+GOOGLE_REFRESH_TOKEN=1//04Q4u2y23Ol1fCgYIARAAGAQSNwF-L9IrwE0syacCnsmfyWysvRcATeF3sMbDtbpXbwrvSPKFUd8P4DRF087MQDSYOdRHKNUbbvk,
+GOOGLE_DRIVE_FOLDER_ID=1V_Ha-FYr_bEeyeWmzhf7rlPPWT6Ki9sl
+
+******************** Đối với laravel 9 ********************
+Tài liệu tham khảo (https://github.com/yaza-putu/laravel-google-drive-storage)
+B1: composer require yaza/laravel-google-drive-storage
+B2: Vào file .env tạo ra các biến môi trường cho GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN, GOOGLE_DRIVE_FOLDER_ID
+VD:
+GOOGLE_CLIENT_ID=935476172930-jpftt1ag0dh04k5qp8q9oqbd74v2q8cb.apps.googleusercontent.com,
+GOOGLE_CLIENT_SECRET=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,
+GOOGLE_REFRESH_TOKEN=1//04Q4u2y23Ol1fCgYIARAAGAQSNwF-L9IrwE0syacCnsmfyWysvRcATeF3sMbDtbpXbwrvSPKFUd8P4DRF087MQDSYOdRHKNUbbvk,
+GOOGLE_DRIVE_FOLDER_ID=1V_Ha-FYr_bEeyeWmzhf7rlPPWT6Ki9sl
+

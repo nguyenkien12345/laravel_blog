@@ -1,0 +1,22 @@
+Chính bản thân Pusher là 1 server
+Pusher lắng nghe client push message đến và trả về cho client khác
+Cài đặt: composer require pusher/pusher-php-server
+Tài liệu tham khảo: https://viblo.asia/p/su-dung-pusher-trong-laravel-tao-thong-bao-realtime-bJzKmX9B59N
+Bước 1: Vào https://dashboard.pusher.com/channels => Click Create app
+Bước 2: Setup thông tin dự án
+Name your app: admin-page-fec
+Select a cluster: ap1 (Asia Pacific (Singapore))
+Front end: Jquery
+Back end => Laravel
+Create App
+Bước 3: Lúc này nó sẽ chuyển đến 1 trang hướng dẫn setup dự án (VD: https://dashboard.pusher.com/apps/1573182/getting_started)
+Bước 4: Trong file env key BROADCAST_DRIVER chuyển từ log thành pusher
+BROADCAST_DRIVER=log => BROADCAST_DRIVER=pusher
+Bước 5: Tạo 1 sự kiện event. Ở đây ta tạo tạm 1 sự kiện đăng ký để test thử (php artisan make:event RegisterEvent)
+- Cái Event này sẽ implements ShouldBroadcast. Trong function broadcastOn chuyển PrivateChannel thành Channel.
+- Chúng ta sẽ khai báo cái chanel mà thằng pusher nó subscribe vào hàm broadcastOn (ở đây là register-channel)
+- Chúng ta sẽ tạo ra 1 hàm broadcastAs. Trong hàm này sẽ return về cái sự kiện mà ta khai báo trong pusher (ở đây là register-event)
+Bước 6: Sau đó ta quay lại trang web https://dashboard.pusher.com/channels. Nhìn lên trên thanh menu ta sẽ thấy Home > Channels > tên dự án. Lúc này
+ta sẽ kiếm đến mục Debug Console. Trong phần Event creator ta sẽ khai báo cái Channel và cái Event của thằng pusher vào
+(ở đây thằng channel là register-channel còn thằng event là register-event). Trong thằng data ta sẽ gõ chứ 'Success'
+

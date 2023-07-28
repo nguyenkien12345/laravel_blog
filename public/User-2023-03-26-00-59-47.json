@@ -1,0 +1,4 @@
+[
+{"user_id":1,"name":"Nguy\u1ec5n Trung Ki\u00ean","email":"nguyenkien11202000@gmail.com","is_admin":0,"remember_token":"4s7tYyUCNxGVHNIUHG6tpDua2rwa6X9uQYqE0cBV6KutX5dTsMjnQq3AbpFh","created_at":"2023-03-19T13:06:16.000000Z","updated_at":"2023-03-19T13:06:41.000000Z","email_verified_at":"2023-03-19 20:06:41","device_token":null,"mobile":"0981284476","otp":null,"image":null,"deleted_at":null,"google_calendar_access_token":null,"google_calendar_refresh_token":null,"google_calendar_user_account_info":null},
+{"user_id":2,"name":"Mai Th\u1ecb Thanh Th\u00fay","email":"super.ad.fec.user@gmail.com","is_admin":0,"remember_token":null,"created_at":"2023-03-19T13:10:10.000000Z","updated_at":"2023-03-19T13:10:19.000000Z","email_verified_at":"2023-03-19 20:10:19","device_token":null,"mobile":"0969776816","otp":null,"image":null,"deleted_at":null,"google_calendar_access_token":null,"google_calendar_refresh_token":null,"google_calendar_user_account_info":null}
+]

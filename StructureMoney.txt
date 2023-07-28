@@ -1,0 +1,35 @@
+Laravel Custom Cast with Brick Money Package
++ Tài liệu tham khảo: (https://github.com/brick/money)
++ Youtube tham khảo: https://www.youtube.com/watch?v=VViQBqC8Dbc
+
++ Để format tiền theo đơn vị phù hợp, hãy gọi phương thức of() nhận vào 2 tham số là giá trị tiền tệ, đơn vị tiền tệ:
+use Brick\Money\Money;
+$money = Money::of(50, 'USD');     // USD 50.00
+$money = Money::of('19.9', 'USD'); // USD 19.90
+Ngoài ra, bạn có thể tạo format từ một số "đơn vị nhỏ" (xu), hãy gọi phương thức phương thức ofMinor() nhận vào 2 tham số là giá trị tiền tệ, đơn vị tiền tệ:
+$money = Money::ofMinor(50, 'USD');     // USD 50.00
+$money = Money::ofMinor('19.9', 'USD'); // USD 19.90
+
+Để hiển thị tiền tệ theo đơn vị phù hợp ta sẽ triển khai như sau:
+B1: composer require brick/money
+B2: php artisan make:cast Money
+B3: vào trong App\Casts\Money custom lại 2 hàm get và set
+public function get($model, string $key, $value, array $attributes)
+{
+    // field price và field currency là 2 field được lấy dựa theo name của table Product
+    return \Brick\Money\Money::ofMinor($attributes['price'], $attributes['currency']);
+}
+
+public function set($model, string $key, $value, array $attributes)
+{
+    if (!$value instanceof \Brick\Money\Money) {
+        return $value;
+    }
+
+    return $value->getMinorAmount()->toInt();
+}
+B4: Thêm vào trong các Model có field price thuộc tính $casts để khi model trả dữ liệu price ra sẽ trả output như mong muốn của chúng ta:
+protected $casts = [
+    'price' => Money::class
+];
+B5: Lúc này trong file view khi hiển thị thuộc tính price thì giá tiền sẽ lập tức được định dạng format lại
